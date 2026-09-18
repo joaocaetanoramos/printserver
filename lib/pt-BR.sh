@@ -51,6 +51,7 @@ MSG_WIFI_INVALID="Opção inválida."
 MSG_WIFI_PASS="Senha do WiFi: "
 MSG_WIFI_CONNECT="Conectando em '%s'..."
 MSG_WIFI_OK="Conectado a '%s'!"
+MSG_WIFI_NODHCP="Conectado, mas sem IP ainda (DHCP pendente ou sem resposta — confira o roteador):"
 
 # ip
 MSG_IP_NOROUTE="Nenhuma rota default ativa. Conecte o cabo ou use ps-wifi primeiro."
