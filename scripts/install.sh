@@ -31,7 +31,8 @@ apt-get upgrade -y
 # ---------------------------------------------
 echo "$(t INST_STEP2)"
 apt-get install -y \
-    cups cups-filters cups-client cups-browsed ipp-usb
+    cups cups-filters cups-client cups-browsed ipp-usb \
+    network-manager
 
 # ---------------------------------------------
 # 3. Drivers (HP, Epson, Brother laser, termica, genericas)
