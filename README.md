@@ -164,20 +164,5 @@ sudo /usr/share/doc/printer-driver-foo2zjs/getweb <modelo>
 - Brother jato de tinta: baixar driver do site da Brother.
 - Zebra/termal/genérica: fila raw via `add-raw-printer.sh` (nenhum driver necessário).
 
-Repositório: https://github.com/joaocaetanoramos/printserver (privado)
+Repositório: https://github.com/joaocaetanoramos/printserver (público)
 Guia original (sem as correções): `docs/guia-original.md`
-
-## Repositório privado — como instalar
-
-O repo é privado, então o `wget` cru para o `raw.githubusercontent` não funciona mais.
-No servidor, autentique-se e clone (pede usuário/senha — use um Personal Access Token como senha):
-
-```bash
-sudo -i
-apt-get update && apt-get install -y git
-git clone https://github.com/joaocaetanoramos/printserver /opt/printserver
-cd /opt/printserver
-bash scripts/bootstrap.sh
-```
-
-> Token com permissão de leitura: GitHub → Settings → Developer settings → Personal access tokens (fine-grained, read-only no repo printserver).
