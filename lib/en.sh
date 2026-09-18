@@ -52,6 +52,7 @@ MSG_WIFI_PASS="WiFi password: "
 MSG_WIFI_CONNECT="Connecting to '%s'..."
 MSG_WIFI_OK="Connected to '%s'!"
 MSG_WIFI_NODHCP="Connected, but no IP yet (DHCP pending or not answering — check the router):"
+MSG_WIFI_FAIL="Could not connect to '%s'. Check the network name (case-sensitive), the password, and the security type (WPA2/WPA3)."
 
 # ip
 MSG_IP_NOROUTE="No active default route. Plug in a cable or run ps-wifi first."
