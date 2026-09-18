@@ -75,7 +75,7 @@ sudo dd if=debian-XX.X.X-amd64-netinst.iso of=/dev/sdX bs=4M status=progress con
 | **Teclado** | Português (Brasil) |
 | **Rede** | Ethernet (DHCP automático) — depois você seta IP fixo |
 | **Hostname** | `printserver` |
-| **Domínio** | `agenciadex.com` (ou deixe em branco) |
+| **Domínio** | `printserver.local` (ou deixe em branco) |
 | **Senha root** | Defina uma senha forte |
 | **Usuário** | Crie um usuário comum (ex: `admin`) |
 | **Disco** | "Guiado - usar disco inteiro" |
@@ -246,8 +246,8 @@ cat << 'EOF' > /etc/cups/cupsd.conf
 # =============================================
 
 # Informações do servidor
-ServerName printserver.agenciadex.com
-ServerAdmin root@agenciadex.com
+ServerName printserver.local
+ServerAdmin root@localhost
 
 # Permitir acesso de qualquer lugar (rede local)
 Listen *:631
@@ -402,7 +402,7 @@ cat << 'EOF' > /etc/samba/smb.conf
 
 [global]
    workgroup = WORKGROUP
-   server string = Print Server DEX
+   server string = Print Server
    server role = standalone server
    log file = /var/log/samba/log.%m
    max log size = 1000
