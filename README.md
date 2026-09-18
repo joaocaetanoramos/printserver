@@ -84,17 +84,17 @@ Depois da instalação, tudo é feito pela interface web do CUPS:
 | **HP** | `hp-setup -i` (detecta USB/rede e instala driver) |
 | **Epson** | Gerenciada automaticamente pelo `printer-driver-escpr`/gutenprint |
 | **Brother laser** | Driver `brlaser` já coberto; jato de tinta Brother: baixar `.deb` do site da Brother e `dpkg -i` |
-| **Zebra / termal / genérica "china"** | Não precisa de driver: fila **raw** na porta 9100. Use o script: |
+| **Zebra / termal / genérica "china"** | Não precisa de driver. **USB:** plugue no servidor → Add Printer → escolha o dispositivo USB → driver **"Raw"** (em "Generic") → pronto. **Rede:** fila raw na porta 9100 com o script: |
 
 ```bash
 /opt/printserver/scripts/add-raw-printer.sh zebra-100 192.168.1.150
 ```
 
-Depois é só mandar o arquivo:
+Depois é só mandar o arquivo (funciona em ambas, USB e rede):
 
 ```bash
 lpr -P zebra-100 etiqueta.zpl        # ZPL
-nc 192.168.1.150 9100 < etiqueta.zpl # direto
+nc 192.168.1.150 9100 < etiqueta.zpl # direto na rede
 ```
 
 Cada impressora termal tem um comando (ZPL, EPL, Esc/POS...). Sem driver, o jeito é raw: você
@@ -164,5 +164,20 @@ sudo /usr/share/doc/printer-driver-foo2zjs/getweb <modelo>
 - Brother jato de tinta: baixar driver do site da Brother.
 - Zebra/termal/genérica: fila raw via `add-raw-printer.sh` (nenhum driver necessário).
 
-Repositório: https://github.com/joaocaetanoramos/printserver
+Repositório: https://github.com/joaocaetanoramos/printserver (privado)
 Guia original (sem as correções): `docs/guia-original.md`
+
+## Repositório privado — como instalar
+
+O repo é privado, então o `wget` cru para o `raw.githubusercontent` não funciona mais.
+No servidor, autentique-se e clone (pede usuário/senha — use um Personal Access Token como senha):
+
+```bash
+sudo -i
+apt-get update && apt-get install -y git
+git clone https://github.com/joaocaetanoramos/printserver /opt/printserver
+cd /opt/printserver
+bash scripts/bootstrap.sh
+```
+
+> Token com permissão de leitura: GitHub → Settings → Developer settings → Personal access tokens (fine-grained, read-only no repo printserver).
