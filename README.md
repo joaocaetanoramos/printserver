@@ -1,136 +1,130 @@
-# Print Server — Debian + CUPS (leve, sem interface)
+# Print Server · Centralize every legacy printer on your network
 
-Servidor de impressão headless: CUPS (IPP), Avahi (descoberta), Samba (Windows legado) e UFW.
-Tudo instalado via **um comando**. O que não dá pra automatizar fica aqui embaixo.
+Turn one old PC or a Raspberry Pi into a **central print hub** for your whole
+organization. Give printers that only speak USB a real network address, and let
+every computer — Windows, macOS, Linux — print to them over the LAN *and* over
+WiFi. No per-device driver hunts, no "who's connected to the printer?" guessing.
+
+> **Printers are meant to be shared. This is the cheapest way to do it.**
+
+> 🇧🇷 Fala português? Veja o [`README.pt-BR.md`](README.pt-BR.md).
+> The interface and scripts follow your system language automatically
+> (English default, Brazilian Portuguese when `LANG` is `pt_*`).
 
 ---
 
-## Como funciona
+## Why you want this
 
-O script `scripts/bootstrap.sh` faz tudo: instala pacotes, escreve as configs, sobe os
-serviços e configura o firewall. Depois só falta **adicionar as impressoras reais**.
+- **Your printer only has USB.** It sits on one desk, and only the person
+  plugged into it can print. This server gives it an IP, and everyone prints to
+  it like it was a network printer.
+- **You juggle many printers** (HP, Brother, Epson, Zebra thermal, generic
+  Chinese ones). One server manages all of them in a single web UI.
+- **Shares & PDF**: print to a shared folder, or "print to PDF" when you just
+  need the file.
+- **Old hardware still rocks.** A decade-old PC or a Raspberry Pi is more than
+  enough. This is a headless, lightweight Debian server — no desktop, no waste.
+- **Zero per-machine setup chaos.** Drivers live in one place. Clients just
+  add a network printer (IPP) and go.
+
+(Images of printers, and of a beat-up old PC happily serving them, go here.)
 
 ---
 
-## 1. Instalar o Debian (manual, uma vez)
+## Features
 
-1. Baixe o netinst: https://www.debian.org/distrib/netinst
-2. Grave num pendrive (Rufus no Windows / `dd` no Linux).
-3. Instale com as recomendações:
-
-| Passo | Recomendação |
+| | |
 |---|---|
-| Idioma | Portuguese (Brazil) |
-| Rede | Ethernet (DHCP) |
-| Hostname | `printserver` |
-| Usuário | `admin` (importante: será o admin do CUPS) |
-| Disco | Guiado, disco inteiro |
-| Seleção de software | **NÃO marcar nada** |
-
-4. Após reiniciar, siga o passo 2 abaixo (a instalação funciona com DHCP; o IP fixo vem
-   depois, também por script).
+| **CUPS/IPP server** | industry-standard printing, works with Windows/macOS/Linux, AirPrint-ready |
+| **Samba** | legacy Windows sharing (`Add printer` via `\\server`) |
+| **Avahi/mDNS** | printers are *discovered* automatically on the network |
+| **Raw socket (9100)** | one-liner for Zebra, thermal and generic printers — no driver needed |
+| **Drivers included** | HP, Brother laser, Epson, 58 mm thermal, foo2zjs for Samsung/Xerox-clones |
+| **Localized** | English by default; Brazilian Portuguese if your system is `pt_BR` |
+| **Git-managed, idempotent** | install once with one command, update the same way |
 
 ---
 
-## 2. Instalar o servidor (automático, 1 comando)
+## What can run this
 
-Como root no servidor:
+- Any old PC (Intel/AMD, **64-bit**).
+- **Raspberry Pi** and similar low-power boards (ARM).
+- Under Debian-based distributions. You'll need ~2 GB of storage for a comfy setup.
+
+> This project installs CUPS, Avahi, Samba and UFW on a minimal Debian install.
+
+---
+
+## Quick start
+
+The whole server is provisioned by **one command**:
 
 ```bash
 sudo -i
 wget -qO- https://raw.githubusercontent.com/joaocaetanoramos/printserver/main/scripts/bootstrap.sh | bash
 ```
 
-Isso:
-- instala CUPS, drivers (HP, Epson, Brother laser, termal, genéricas), Avahi, Samba, UFW;
-- copia scripts de operação para `/opt/printserver`;
-- adiciona o usuário no grupo `lpadmin`;
-- libera a porta 631 (CUPS), 9100 (raw), 5353 (Avahi) e Samba no firewall;
-- habilita e inicia os serviços.
+The installer:
+- installs CUPS + drivers (HP, Epson, Brother laser, thermal, generic), Avahi, Samba, UFW;
+- copies operational scripts, adds your user to `lpadmin`;
+- opens the right ports (631 CUPS, 9100 raw, 5353 Avahi, Samba);
+- enables and starts services.
 
-Depois do bootstrap, defina o **IP fixo** com `ps-ip` (ele usa IP/gateway/DNS atuais como
-sugestão — veja a seção [IP fixo](#ip-fixo-ethernet-ou-wifi)).
+First boot (once, manual):
+1. Install Debian netinst — lang Portuguese/English, hostname `printserver`, user `admin`.
+   **Do not tick any package selection.**
+2. Run the command above.
+3. Set a **static IP** with `ps-ip` (it suggests your current address/gateway/DNS).
+4. Add your printers in the CUPS web UI — `http://SERVER-IP:631`.
 
----
+### Add printers
 
-## Atualizações
-
-O repositório é a fonte única de verdade: configs, drivers e scripts. Atualizar é
-**idempotente** — roda de novo e só aplica o que mudou:
-
-```bash
-sudo -i
-ps-update          # ou: bash /opt/printserver/scripts/update.sh
-```
-
-O `update.sh` faz `git pull`, reinstala/reconfigura e reinicia os serviços. Como o
-`install.sh` regrava as configs (AVAHI/Samba) direto do repo, **edite configs no clone**
-`/opt/printserver/configs/` em vez de em `/etc/...`, senão seus ajustes são sobrescritos
-na próxima atualização.
-
-> Não sabe se já instalou? O one-liner do bootstrap também serve de update (ele detecta o
-> clone existente e só faz pull).
-
----
-
-## 3. Adicionar as impressoras (manual, depende de cada modelo)
-
-Depois da instalação, tudo é feito pela interface web do CUPS:
-**http://IP-DO-SERVIDOR:631** → Administration → Add Printer (usar o usuário `admin`).
-
-### Por tipo de impressora
-
-| Tipo | Como configurar |
+| Printer | How |
 |---|---|
-| **USB** | Plugue no servidor → Add Printer → aparece na lista → escolhe o driver |
-| **Rede (IPP/Network)** | Add Printer → "IPP / Network Printer" ou discovery automático |
-| **HP** | `hp-setup -i` (detecta USB/rede e instala driver) |
-| **Epson** | Gerenciada automaticamente pelo `printer-driver-escpr`/gutenprint |
-| **Brother laser** | Driver `brlaser` já coberto; jato de tinta Brother: baixar `.deb` do site da Brother e `dpkg -i` |
-| **Zebra / termal / genérica "china"** | Não precisa de driver. **USB:** plugue no servidor → Add Printer → escolha o dispositivo USB → driver **"Raw"** (em "Generic") → pronto. **Rede:** fila raw na porta 9100 com o script: |
+| USB | plug it in → CUPS web UI → Add Printer → pick the USB device → driver |
+| Network/IPP | CUPS web UI → "IPP / Network Printer", or auto-discovery |
+| HP | `hp-setup -i` |
+| Epson | managed automatically (escpr/gutenprint) |
+| Brother laser | covered by `brlaser`; inkjet: download the `.deb` from Brother |
+| Zebra / thermal / generic | no driver at all — raw queue: |
 
 ```bash
 ps-add-raw-printer zebra-100 192.168.1.150
-```
-
-Depois é só mandar o arquivo (funciona em ambas, USB e rede):
-
-```bash
-lpr -P zebra-100 etiqueta.zpl        # ZPL
-nc 192.168.1.150 9100 < etiqueta.zpl # direto na rede
-```
-
-Cada impressora termal tem um comando (ZPL, EPL, Esc/POS...). Sem driver, o jeito é raw: você
-manda o comando/snprintf diretamente.
-
-### Testar
-
-```bash
-# imprimir página de teste
-lp -d nome_da_impressora /etc/hostname  # texto qualquer
-
-# status da fila
-lpq
-lpstat -p -d
+lpr -P zebra-100 label.zpl
 ```
 
 ---
 
-## Comandos úteis (atalhos `ps-*` em `/usr/local/bin`)
+## Commands (installed as `/usr/local/bin/ps-*`)
 
-| Ação | Comando |
+| Action | Command |
 |---|---|
-| Status geral | `ps-status` |
-| Diagnóstico completo | `ps-check` |
-| Reiniciar serviços | `ps-restart` |
-| Logs em tempo real | `ps-logs` |
-| Backup de configs | `ps-backup` |
-| Atualizar a partir do repo | `ps-update` |
-| Firewall | `ps-firewall` |
-| Impressora raw (Zebra/genérica) | `ps-add-raw-printer nome ip` |
-| Conectar ao WiFi | `ps-wifi` (menu) ou `ps-wifi SSID SENHA` |
-| IP fixo (Eth ou WiFi) | `ps-ip` |
-| Ferramentas de impressora | `lpinfo -v`, `lpstat -p`, `lpq`, `cancel -a` |
+| Status overview | `ps-status` |
+| Full diagnostics | `ps-check` |
+| Restart services | `ps-restart` |
+| Tail logs | `ps-logs` |
+| Backup configs | `ps-backup` |
+| Connect to WiFi | `ps-wifi` |
+| Set static IP | `ps-ip` |
+| Raw printer (Zebra/generic) | `ps-add-raw-printer name ip` |
+| Update from the repo | `ps-update` |
+| Printer tools | `lpinfo -v`, `lpstat -p`, `lpq`, `cancel -a` |
+
+---
+
+## Updates
+
+The repository is the single source of truth. Updates are **idempotent** — re-run
+and only the changes apply:
+
+```bash
+sudo -i
+ps-update
+```
+
+`update.sh` does a `git pull`, re-applies configs and restarts services.
+Configs are copied from the repo on every update — edit them in
+`/opt/printserver/configs/`, not in `/etc/...`, or your tweaks will be overwritten.
 
 ---
 
@@ -138,72 +132,67 @@ lpstat -p -d
 
 ```bash
 sudo -i
-ps-wifi             # lista redes, você escolhe o número e digita a senha
-# ou direto:
-ps-wifi MinhaRede 12345678
+ps-wifi                # list networks, pick one, type the password
+ps-wifi MySSID MyPass  # or connect directly
 ```
 
-Instala o NetworkManager se preciso. O NetworkManager só gerencia o WiFi — a interface
-Ethernet configurada em `/etc/network/interfaces` continua intacta.
+NetworkManager is installed if missing and left to manage only WiFi — the
+Ethernet config from `/etc/network/interfaces` stays untouched.
+
+Best practice for a WiFi-only box: keep DHCP but set a **DHCP reservation** for
+the server's MAC in your router — the IP then never changes. `ps-ip` shows you
+the MAC to register.
 
 ---
 
-## IP fixo (Ethernet ou WiFi)
+## Static IP (`ps-ip`)
 
-```bash
-sudo -i
-ps-ip
-```
+Detects the active interface and offers your current IP/gateway/DNS as
+suggestions — you just confirm or tweak:
 
-Detecta a interface ativa e usa os **valores atuais** (IP, gateway, DNS) como sugestão —
-você apenas confirma ou ajusta:
+- **Ethernet** → writes `/etc/network/interfaces` (backup in `/root/net-backup`)
+  and applies without dropping your SSH session. Permanent after a reboot.
+- **WiFi** → applies through NetworkManager (`nmcli`) and reconnects (your SSH
+  session drops briefly).
 
-- **Ethernet** → grava `/etc/network/interfaces` (com backup em `/root/net-backup`) e aplica
-  sem derrubar a sessão SSH. Reboot torna definitivo.
-- **WiFi** → aplica via NetworkManager (`nmcli`) e reconecta (a sessão SSH cai por segundos).
-
-> Usando só WiFi? A alternativa mais robusta a IP fixo é a **reserva DHCP no roteador**:
-> o `ps-ip` mostra o MAC do servidor para você registrar na reserva e o IP nunca muda.
+Private networks you don't have to fear: this shares *printers only*, not files.
 
 ---
 
-## Solução de problemas
+## Troubleshooting
 
-### Impressora não aparece na rede
-```bash
-systemctl status avahi-daemon
-avahi-browse -rt _ipp._tcp        # quem está anunciando IPP na rede
-```
-
-### CUPS não responde
-```bash
-ss -tlnp | grep 631               # está escutando?
-tail -50 /var/log/cups/error_log
-```
-
-### Windows não instala via Samba (legado)
-```bash
-testparm -s                       # valida o smb.conf
-systemctl status smbd
-```
-Preferir instalação por IPP no Windows (Adicionar impressora → "IP ou hostname" →
-`http://IP-DO-SERVIDOR:631/printers/NOME_DA_IMPRESSORA`). É mais moderno que Samba.
-
-### Driver foo2zjs precisa de firmware (genéricas Samsung/Xerox)
-O pacote instala o driver; a firmware extra é baixada de site externo quando o modelo exige:
-```bash
-sudo /usr/share/doc/printer-driver-foo2zjs/getweb <modelo>
-```
+| Symptom | Fix |
+|---|---|
+| Printer not discovered on the network | `systemctl status avahi-daemon` · `avahi-browse -rt _ipp._tcp` |
+| CUPS not answering | `ss -tlnp \| grep 631` · `tail -50 /var/log/cups/error_log` |
+| Old Windows won't install over Samba | use IPP instead: add printer → `http://SERVER-IP:631/printers/NAME` |
+| foo2zjs firmware missing (Samsung/Xerox-clones) | `sudo /usr/share/doc/printer-driver-foo2zjs/getweb <model>` |
 
 ---
 
-## O que fica manual (resumo)
+## Internationalization
 
-- Instalar o Debian + definir IP fixo (rede de cada um).
-- Adicionar as impressoras reais (depende do modelo/firmware — seção 3 acima).
-- HP: rodar `hp-setup -i`.
-- Brother jato de tinta: baixar driver do site da Brother.
-- Zebra/termal/genérica: fila raw via `add-raw-printer.sh` (nenhum driver necessário).
+Messages and the interface follow the system locale:
 
-Repositório: https://github.com/joaocaetanoramos/printserver (público)
-Guia original (sem as correções): `docs/guia-original.md`
+- `LANG=pt_BR.*` → **Portuguese (Brazil)**
+- anything else → **English** (default)
+
+Override with: `PS_LANG=pt-BR ps-ip`.
+
+---
+
+## Manual steps that can't be automated
+
+| Step | Why |
+|---|---|
+| Install Debian netinst, set root password | boot-time and install-time only |
+| Static IP (now via `ps-ip`) | network-specific |
+| Add the actual printers | model/firmware-specific (HP `hp-setup`, Brother `.deb`) |
+| Zebra/thermal/generic | raw queue via `ps-add-raw-printer` |
+
+---
+
+## License & notes
+
+Runs on Debian-based systems; everything used here (CUPS, Samba, Avahi, UFW,
+the `printer-driver-*` packages) is free and open source.
