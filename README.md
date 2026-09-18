@@ -87,7 +87,7 @@ Depois da instalação, tudo é feito pela interface web do CUPS:
 | **Zebra / termal / genérica "china"** | Não precisa de driver. **USB:** plugue no servidor → Add Printer → escolha o dispositivo USB → driver **"Raw"** (em "Generic") → pronto. **Rede:** fila raw na porta 9100 com o script: |
 
 ```bash
-/opt/printserver/scripts/add-raw-printer.sh zebra-100 192.168.1.150
+ps-add-raw-printer zebra-100 192.168.1.150
 ```
 
 Depois é só mandar o arquivo (funciona em ambas, USB e rede):
@@ -113,15 +113,17 @@ lpstat -p -d
 
 ---
 
-## Comandos úteis (já instalados em `/opt/printserver`)
+## Comandos úteis (atalhos `ps-*` em `/usr/local/bin`)
 
 | Ação | Comando |
 |---|---|
-| Status geral | `bash /opt/printserver/scripts/status.sh` |
-| Diagnóstico completo | `bash /opt/printserver/scripts/check.sh` |
-| Reiniciar serviços | `bash /opt/printserver/scripts/restart.sh` |
-| Logs em tempo real | `bash /opt/printserver/scripts/logs.sh` |
-| Backup de configs | `bash /opt/printserver/scripts/backup.sh` |
+| Status geral | `ps-status` |
+| Diagnóstico completo | `ps-check` |
+| Reiniciar serviços | `ps-restart` |
+| Logs em tempo real | `ps-logs` |
+| Backup de configs | `ps-backup` |
+| Firewall | `ps-firewall` |
+| Impressora raw (Zebra/genérica) | `ps-add-raw-printer nome ip` |
 | Ferramentas de impressora | `lpinfo -v`, `lpstat -p`, `lpq`, `cancel -a` |
 
 ---
