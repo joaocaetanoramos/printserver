@@ -120,6 +120,12 @@ echo "Habilitando servicos..."
 systemctl enable cups cups-browsed avahi-daemon smbd nmbd
 systemctl restart cups cups-browsed avahi-daemon smbd nmbd
 
+# --- Atalhos em /usr/local/bin (rode: ps-status, ps-logs, ps-backup...)
+for s in "$BASE_DIR"/scripts/*.sh; do
+    ln -sf "$s" "/usr/local/bin/ps-$(basename "$s" .sh)"
+done
+echo "Atalhos criados: ps-status ps-check ps-logs ps-restart ps-backup ps-firewall ps-add-raw-printer"
+
 echo ""
 echo "=========================================="
 echo "  Instalacao concluida!"
