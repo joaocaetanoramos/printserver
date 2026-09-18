@@ -55,8 +55,21 @@ if [ -z "$PW" ]; then
 fi
 
 tf WIFI_CONNECT "$SSID"
-nmcli dev wifi connect "$SSID" password "$PW" ifname "$DEV"
+nmcli dev wifi connect "$SSID" password "$PW" ifname "$DEV" >/dev/null
+
+IP=""
+for _ in $(seq 1 20); do
+    IP=$(ip -4 -o addr show dev "$DEV" scope global | awk '{print $4}' | cut -d/ -f1)
+    [ -n "$IP" ] && break
+    sleep 1
+done
 
 echo ""
-tf WIFI_OK "$SSID"
-ip -4 addr show "$DEV" | grep inet
+if [ -n "$IP" ]; then
+    tf WIFI_OK "$SSID"
+    echo "  IP: $(echo "$IP")  GW: $(ip route | awk '/default/{print $3; exit}')"
+else
+    echo "$(t WIFI_NODHCP)"
+    nmcli dev status || true
+    exit 1
+fi
