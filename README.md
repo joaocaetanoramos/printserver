@@ -65,7 +65,7 @@ wget -qO- https://raw.githubusercontent.com/joaocaetanoramos/printserver/main/sc
 ```
 
 The installer:
-- installs CUPS + drivers (HP, Epson, Brother laser, thermal, generic), Avahi, Samba, UFW;
+- installs CUPS + drivers (HP, Epson, Brother laser, thermal, generic), Avahi, Samba, UFW, **NetworkManager (WiFi ready)**;
 - copies operational scripts, adds your user to `lpadmin`;
 - opens the right ports (631 CUPS, 9100 raw, 5353 Avahi, Samba);
 - enables and starts services.
@@ -137,7 +137,7 @@ ps-wifi                # list networks, pick one, type the password
 ps-wifi MySSID MyPass  # or connect directly
 ```
 
-NetworkManager is installed if missing and left to manage only WiFi — the
+NetworkManager is installed at install time and left to manage only WiFi — the
 Ethernet config from `/etc/network/interfaces` stays untouched.
 
 Best practice for a WiFi-only box: keep DHCP but set a **DHCP reservation** for
