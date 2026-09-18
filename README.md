@@ -70,6 +70,26 @@ Isso:
 
 ---
 
+## Atualizações
+
+O repositório é a fonte única de verdade: configs, drivers e scripts. Atualizar é
+**idempotente** — roda de novo e só aplica o que mudou:
+
+```bash
+sudo -i
+ps-update          # ou: bash /opt/printserver/scripts/update.sh
+```
+
+O `update.sh` faz `git pull`, reinstala/reconfigura e reinicia os serviços. Como o
+`install.sh` regrava as configs (AVAHI/Samba) direto do repo, **edite configs no clone**
+`/opt/printserver/configs/` em vez de em `/etc/...`, senão seus ajustes são sobrescritos
+na próxima atualização.
+
+> Não sabe se já instalou? O one-liner do bootstrap também serve de update (ele detecta o
+> clone existente e só faz pull).
+
+---
+
 ## 3. Adicionar as impressoras (manual, depende de cada modelo)
 
 Depois da instalação, tudo é feito pela interface web do CUPS:
@@ -122,6 +142,7 @@ lpstat -p -d
 | Reiniciar serviços | `ps-restart` |
 | Logs em tempo real | `ps-logs` |
 | Backup de configs | `ps-backup` |
+| Atualizar a partir do repo | `ps-update` |
 | Firewall | `ps-firewall` |
 | Impressora raw (Zebra/genérica) | `ps-add-raw-printer nome ip` |
 | Ferramentas de impressora | `lpinfo -v`, `lpstat -p`, `lpq`, `cancel -a` |
