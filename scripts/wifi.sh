@@ -56,17 +56,28 @@ fi
 
 tf WIFI_CONNECT "$SSID"
 CONN_OK=0
+LAST_ERR=""
 for KM in auto wpa-psk sae; do
     if [ "$KM" = auto ]; then
-        if nmcli dev wifi connect "$SSID" password "$PW" ifname "$DEV" >/dev/null 2>&1; then CONN_OK=1; fi
+        OUT=$(nmcli dev wifi connect "$SSID" password "$PW" ifname "$DEV" 2>&1) && CONN_OK=1
     else
-        if nmcli dev wifi connect "$SSID" password "$PW" ifname "$DEV" wifi-sec.key-mgmt "$KM" >/dev/null 2>&1; then CONN_OK=1; fi
+        OUT=$(nmcli dev wifi connect "$SSID" password "$PW" ifname "$DEV" wifi-sec.key-mgmt "$KM" 2>&1) && CONN_OK=1
     fi
+    LAST_ERR=$OUT
     if [ "$CONN_OK" = 1 ]; then break; fi
 done
+
+if [ "$CONN_OK" != 1 ]; then
+    nmcli con delete id "$SSID" >/dev/null 2>&1
+    LAST_ERR=$(nmcli dev wifi connect "$SSID" password "$PW" ifname "$DEV" wifi-sec.key-mgmt wpa-psk 2>&1) && CONN_OK=1
+fi
+
 if [ "$CONN_OK" != 1 ]; then
     echo ""
     tf WIFI_FAIL "$SSID"
+    echo "$LAST_ERR" | sed 's/^/     /'
+    echo ""
+    nmcli dev status || true
     exit 1
 fi
 
