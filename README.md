@@ -75,7 +75,8 @@ First boot (once, manual):
    username you like (the installer auto-detects it).
    **Do not tick any package selection.**
 2. Run the command above.
-3. Set a **static IP** with `ps-ip` (it suggests your current address/gateway/DNS).
+3. The installer pins your current IP automatically (no more address changes
+   after a reboot — skip with `PS_NO_STATIC_IP=1`).
 4. Add your printers in the CUPS web UI — `http://SERVER-IP:631`.
 
 ### Add printers
@@ -148,13 +149,24 @@ the MAC to register.
 
 ## Static IP (`ps-ip`)
 
-Detects the active interface and offers your current IP/gateway/DNS as
-suggestions — you just confirm or tweak:
+The installer **pins your current IP automatically** at the end, so the address
+stays after a reboot. Skip or control it anytime:
+
+- `ps-ip` → interactive (suggests your current IP/gateway/DNS, you confirm or tweak)
+- `ps-ip --auto` → non-interactive: fix the current IP (what the installer uses)
+- `ps-ip --dhcp` → back to DHCP (IP from the router)
+- `PS_NO_STATIC_IP=1` → skip the auto step during install
 
 - **Ethernet** → writes `/etc/network/interfaces` (backup in `/root/net-backup`)
   and applies without dropping your SSH session. Permanent after a reboot.
 - **WiFi** → applies through NetworkManager (`nmcli`) and reconnects (your SSH
   session drops briefly).
+
+> One word of caution: pinning uses the IP the router currently hands out. If
+> your router's DHCP pool re-assigns that address to another device when the
+> lease expires, you'd have a conflict. Rare on small LANs — if it happens, set
+> a **DHCP reservation** for the server's MAC instead (the installer prints the
+> MAC, or `ps-ip` shows it).
 
 Private networks you don't have to fear: this shares *printers only*, not files.
 
