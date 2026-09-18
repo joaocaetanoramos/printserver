@@ -75,7 +75,8 @@ Primeiro boot (manual, uma vez):
    nome de usuário que você quiser (o instalador detecta automaticamente).
    **Não marque nenhuma seleção de pacotes.**
 2. Rode o comando acima.
-3. Defina um **IP fixo** com `ps-ip` (ele sugere seu IP/gateway/DNS atuais).
+3. O instalador fixa seu **IP atual** automaticamente (não muda mais no reboot —
+   pule com `PS_NO_STATIC_IP=1`).
 4. Adicione suas impressoras na interface web do CUPS — `http://IP-DO-SERVIDOR:631`.
 
 ### Adicionar impressoras
@@ -148,13 +149,23 @@ pra você registrar.
 
 ## IP fixo (`ps-ip`)
 
-Detecta a interface ativa e oferece seu IP/gateway/DNS atuais como sugestão —
-você só confirma ou ajusta:
+O instalador **fixa seu IP atual automaticamente** no fim da instalação, pra que o
+endereço não mude no reboot. Controle quando quiser:
+
+- `ps-ip` → interativo (sugere seu IP/gateway/DNS atuais, você confirma ou ajusta)
+- `ps-ip --auto` → não-interativo: fixa o IP atual (é o que o instalador usa)
+- `ps-ip --dhcp` → volta para DHCP (IP vem do roteador)
+- `PS_NO_STATIC_IP=1` → pula esse passo durante a instalação
 
 - **Ethernet** → grava `/etc/network/interfaces` (backup em `/root/net-backup`)
   e aplica sem derrubar sua sessão SSH. Fica definitivo depois de um reboot.
 - **WiFi** → aplica pelo NetworkManager (`nmcli`) e reconecta (a sessão SSH cai
   por segundos).
+
+> Atenção: a fixação usa o IP que o roteador entrega no momento. Se a faixa de
+> DHCP do roteador reassinar esse endereço a outro aparelho quando o prazo expirar,
+> vira conflito. Raro em redes pequenas — se acontecer, faça a **reserva de DHCP**
+> da MAC do servidor no roteador (o instalador mostra a MAC, ou `ps-ip` exibe).
 
 Nada de medo com redes alheias: isto compartilha *só impressoras*, não arquivos.
 
