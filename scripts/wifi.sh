@@ -16,11 +16,8 @@ if [ "$(id -u)" -ne 0 ]; then
 fi
 
 if ! command -v nmcli >/dev/null 2>&1; then
-    echo "$(t WIFI_NM)"
-    apt-get install -y network-manager
-    systemctl enable NetworkManager
-    systemctl restart NetworkManager
-    sleep 3
+    echo "$(t WIFI_NM_MISSING)"
+    exit 1
 fi
 
 DEV=$(nmcli -t -f DEVICE,TYPE dev status | awk -F: '$2 == "wifi" {print $1}' | head -1)
