@@ -27,28 +27,8 @@ serviços e configura o firewall. Depois só falta **adicionar as impressoras re
 | Disco | Guiado, disco inteiro |
 | Seleção de software | **NÃO marcar nada** |
 
-4. Após reiniciar, defina o **IP fixo** (ajuste à sua rede):
-
-```bash
-# veja o nome da interface
-ip a
-nano /etc/network/interfaces
-```
-
-```conf
-auto enp0s3
-iface enp0s3 inet static
-    address 192.168.1.100
-    netmask 255.255.255.0
-    gateway 192.168.1.1
-    dns-nameservers 8.8.8.8 8.8.4.4
-```
-
-```bash
-systemctl restart networking
-```
-
-> ⚠️ Se você está logado por SSH, reiniciar a rede derruba a sessão. Pode usar `reboot` também.
+4. Após reiniciar, siga o passo 2 abaixo (a instalação funciona com DHCP; o IP fixo vem
+   depois, também por script).
 
 ---
 
@@ -67,6 +47,9 @@ Isso:
 - adiciona o usuário no grupo `lpadmin`;
 - libera a porta 631 (CUPS), 9100 (raw), 5353 (Avahi) e Samba no firewall;
 - habilita e inicia os serviços.
+
+Depois do bootstrap, defina o **IP fixo** com `ps-ip` (ele usa IP/gateway/DNS atuais como
+sugestão — veja a seção [IP fixo](#ip-fixo-ethernet-ou-wifi)).
 
 ---
 
