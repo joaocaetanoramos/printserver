@@ -145,7 +145,22 @@ lpstat -p -d
 | Atualizar a partir do repo | `ps-update` |
 | Firewall | `ps-firewall` |
 | Impressora raw (Zebra/genérica) | `ps-add-raw-printer nome ip` |
+| Conectar ao WiFi | `ps-wifi` (menu) ou `ps-wifi SSID SENHA` |
 | Ferramentas de impressora | `lpinfo -v`, `lpstat -p`, `lpq`, `cancel -a` |
+
+---
+
+## WiFi
+
+```bash
+sudo -i
+ps-wifi             # lista redes, você escolhe o número e digita a senha
+# ou direto:
+ps-wifi MinhaRede 12345678
+```
+
+Instala o NetworkManager se preciso. O NetworkManager só gerencia o WiFi — a interface
+Ethernet configurada em `/etc/network/interfaces` continua intacta.
 
 ---
 
