@@ -1,29 +1,33 @@
 #!/bin/bash
 # Verificacao rapida do print server
+_PS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
+_REPO_DIR="$(dirname "$(dirname "$_PS_SCRIPT")")"
+. "$_REPO_DIR/lib/i18n.sh"
+
 echo "=========================================="
-echo "  Print Server - Status"
+echo "$(t STATUS_HEADER)"
 echo "=========================================="
 
-echo ">>> CUPS:"
-systemctl is-active cups && echo "   Ativo" || echo "   INATIVO"
+echo "$(t STATUS_CUPS)"
+systemctl is-active cups >/dev/null 2>&1 && echo "$(t STATUS_ACTIVE)" || echo "$(t STATUS_INACTIVE)"
 
-echo ">>> cups-browsed (descobre impressoras de rede):"
-systemctl is-active cups-browsed && echo "   Ativo" || echo "   INATIVO"
+echo "$(t STATUS_BROWSED)"
+systemctl is-active cups-browsed >/dev/null 2>&1 && echo "$(t STATUS_ACTIVE)" || echo "$(t STATUS_INACTIVE)"
 
-echo ">>> Avahi:"
-systemctl is-active avahi-daemon && echo "   Ativo" || echo "   INATIVO"
+echo "$(t STATUS_AVAHI)"
+systemctl is-active avahi-daemon >/dev/null 2>&1 && echo "$(t STATUS_ACTIVE)" || echo "$(t STATUS_INACTIVE)"
 
-echo ">>> Samba:"
-systemctl is-active smbd && echo "   Ativo" || echo "   INATIVO"
+echo "$(t STATUS_SAMBA)"
+systemctl is-active smbd >/dev/null 2>&1 && echo "$(t STATUS_ACTIVE)" || echo "$(t STATUS_INACTIVE)"
 
-echo ">>> Firewall:"
-ufw status verbose | head -4
+echo "$(t STATUS_FW)"
+ufw status verbose 2>/dev/null | head -4
 
-echo ">>> Impressoras configuradas:"
-lpstat -p 2>/dev/null || echo "   Nenhuma impressora configurada"
+echo "$(t STATUS_PRINTERS)"
+lpstat -p 2>/dev/null || echo "$(t STATUS_NONE)"
 
-echo ">>> Fila:"
-lpstat -o 2>/dev/null || echo "   Fila vazia"
+echo "$(t STATUS_QUEUE)"
+lpstat -o 2>/dev/null || echo "$(t STATUS_QUEUE_EMPTY)"
 
-echo ">>> Rede:"
+echo "$(t STATUS_NET)"
 ip -4 addr show scope global | grep inet
