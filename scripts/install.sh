@@ -125,6 +125,13 @@ for s in "$_REPO_DIR"/scripts/*.sh; do
 done
 echo "$(t INST_SHORTCUTS)"
 
+# --- IP fixo: evita o IP mudar no reboot (pule com PS_NO_STATIC_IP=1)
+if [ "$PS_NO_STATIC_IP" != 1 ]; then
+    echo ""
+    echo "$(t INST_STEP_IP)"
+    bash "$_REPO_DIR/scripts/ip.sh" --auto || true
+fi
+
 echo ""
 echo "=========================================="
 echo "$(t INST_DONE)"
