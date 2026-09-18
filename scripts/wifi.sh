@@ -55,7 +55,20 @@ if [ -z "$PW" ]; then
 fi
 
 tf WIFI_CONNECT "$SSID"
-nmcli dev wifi connect "$SSID" password "$PW" ifname "$DEV" >/dev/null
+CONN_OK=0
+for KM in auto wpa-psk sae; do
+    if [ "$KM" = auto ]; then
+        if nmcli dev wifi connect "$SSID" password "$PW" ifname "$DEV" >/dev/null 2>&1; then CONN_OK=1; fi
+    else
+        if nmcli dev wifi connect "$SSID" password "$PW" ifname "$DEV" wifi-sec.key-mgmt "$KM" >/dev/null 2>&1; then CONN_OK=1; fi
+    fi
+    if [ "$CONN_OK" = 1 ]; then break; fi
+done
+if [ "$CONN_OK" != 1 ]; then
+    echo ""
+    tf WIFI_FAIL "$SSID"
+    exit 1
+fi
 
 IP=""
 for _ in $(seq 1 20); do
