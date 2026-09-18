@@ -90,18 +90,20 @@ mkdir -p /var/lib/samba/printers
 chmod 755 /var/lib/samba/printers
 
 # --- Usuario admin do CUPS (para usar a UI web e adicionar impressoras)
-ADMIN_USER=admin
-if ! id "$ADMIN_USER" >/dev/null 2>&1; then
+ADMIN_USER="${ADMIN_USER:-admin}"
+if ! id "$ADMIN_USER" >/dev/null 2>&1 && [ -t 0 ]; then
     echo "$(t INST_ADMIN_MISSING)"
-    if [ -t 0 ]; then
-        read -r -p "$(t INST_ADMIN_PROMPT)" ADMIN_USER
-    fi
+    read -r -p "$(t INST_ADMIN_PROMPT)" ADMIN_USER
+fi
+if ! id "$ADMIN_USER" >/dev/null 2>&1; then
+    ADMIN_USER="$(getent passwd 1000 | cut -d: -f1)"
 fi
 if id "$ADMIN_USER" >/dev/null 2>&1; then
     usermod -aG lpadmin "$ADMIN_USER"
     tf INST_ADMIN_ADDED "$ADMIN_USER"
 else
-    tf INST_ADMIN_ERR "$ADMIN_USER"
+    tf INST_ADMIN_ERR "${ADMIN_USER:-(empty)}"
+    echo "  usermod -aG lpadmin <username>  $(t INST_ADMIN_HINT)"
 fi
 
 # --- Habilitar e iniciar servicos
