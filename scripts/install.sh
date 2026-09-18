@@ -8,6 +8,10 @@ _PS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 _REPO_DIR="$(dirname "$(dirname "$_PS_SCRIPT")")"
 . "$_REPO_DIR/lib/i18n.sh"
 
+# GitHub Contents API nao preserva o bit de execucao: ignora o modo dos
+# arquivos para o git pull nao abortar sempre que o chmod +x roda.
+git -C "$_REPO_DIR" config core.fileMode false 2>/dev/null || true
+
 if [ "$(id -u)" -ne 0 ]; then
     echo "$(t ROOT_ERR)"
     exit 1
