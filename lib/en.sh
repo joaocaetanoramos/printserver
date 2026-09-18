@@ -41,6 +41,7 @@ MSG_FW_DONE="Firewall configured!"
 
 # wifi
 MSG_WIFI_NM="Installing NetworkManager..."
+MSG_WIFI_NM_MISSING="NetworkManager is not installed. Run the installer once (ps-update) to install it."
 MSG_WIFI_NODEV="No WiFi interface detected:"
 MSG_WIFI_SCAN="Scanning for WiFi networks..."
 MSG_WIFI_NONE="No networks found. Check the antenna is enabled or get closer to the router."
