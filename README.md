@@ -71,7 +71,8 @@ The installer:
 - enables and starts services.
 
 First boot (once, manual):
-1. Install Debian netinst — lang Portuguese/English, hostname `printserver`, user `admin`.
+1. Install Debian netinst — your choice of language, hostname `printserver`, any
+   username you like (the installer auto-detects it).
    **Do not tick any package selection.**
 2. Run the command above.
 3. Set a **static IP** with `ps-ip` (it suggests your current address/gateway/DNS).
