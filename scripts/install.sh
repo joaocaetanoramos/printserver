@@ -40,7 +40,7 @@ echo "$(t INST_STEP3)"
 apt-get install -y \
     printer-driver-gutenprint printer-driver-postscript-hp hplip \
     printer-driver-brlaser printer-driver-escpr \
-    printer-driver-zj-58 printer-driver-foo2zjs
+    printer-driver-foo2zjs
 
 # ---------------------------------------------
 # 4. Avahi (descoberta de rede)
