@@ -113,6 +113,7 @@ systemctl restart cups cups-browsed avahi-daemon smbd nmbd
 
 # --- Atalhos em /usr/local/bin (rode: ps-status, ps-logs, ps-backup...)
 for s in "$_REPO_DIR"/scripts/*.sh; do
+    chmod +x "$s"
     ln -sf "$s" "/usr/local/bin/ps-$(basename "$s" .sh)"
 done
 echo "$(t INST_SHORTCUTS)"
