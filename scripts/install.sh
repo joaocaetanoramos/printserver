@@ -124,5 +124,7 @@ echo "=========================================="
 echo "$(t INST_DONE)"
 echo "=========================================="
 echo "$(t INST_CUPS_URL)"
+echo "$(t INST_ACCESS)"
+ip -4 -o addr show scope global | awk '{gsub(/\/.*/,"",$4); print "     ("$2") http://"$4}'
 echo "$(t INST_FIRMWARE)"
 echo ""
