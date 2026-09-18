@@ -52,6 +52,7 @@ MSG_WIFI_PASS="Senha do WiFi: "
 MSG_WIFI_CONNECT="Conectando em '%s'..."
 MSG_WIFI_OK="Conectado a '%s'!"
 MSG_WIFI_NODHCP="Conectado, mas sem IP ainda (DHCP pendente ou sem resposta — confira o roteador):"
+MSG_WIFI_FAIL="Não consegui conectar em '%s'. Confira o nome da rede (maiúsculas/minúsculas), a senha e o tipo de segurança (WPA2/WPA3)."
 
 # ip
 MSG_IP_NOROUTE="Nenhuma rota default ativa. Conecte o cabo ou use ps-wifi primeiro."
