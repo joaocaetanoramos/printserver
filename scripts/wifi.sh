@@ -6,13 +6,17 @@
 # =============================================
 set -e
 
+_PS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
+_REPO_DIR="$(dirname "$(dirname "$_PS_SCRIPT")")"
+. "$_REPO_DIR/lib/i18n.sh"
+
 if [ "$(id -u)" -ne 0 ]; then
-    echo "Rode como root (sudo -i)."
+    echo "$(t ROOT_ERR)"
     exit 1
 fi
 
 if ! command -v nmcli >/dev/null 2>&1; then
-    echo "Instalando NetworkManager..."
+    echo "$(t WIFI_NM)"
     apt-get install -y network-manager
     systemctl enable NetworkManager
     systemctl restart NetworkManager
@@ -21,7 +25,7 @@ fi
 
 DEV=$(nmcli -t -f DEVICE,TYPE dev status | awk -F: '$2 == "wifi" {print $1}' | head -1)
 if [ -z "$DEV" ]; then
-    echo "Nenhuma interface WiFi detectada:"
+    echo "$(t WIFI_NODEV)"
     nmcli dev status || true
     exit 1
 fi
@@ -32,30 +36,30 @@ SSID="$1"
 PW="$2"
 
 if [ -z "$SSID" ]; then
-    echo "Procurando redes WiFi..."
+    echo "$(t WIFI_SCAN)"
     nmcli -t -f SSID,SIGNAL,SECURITY dev wifi list --rescan yes >/tmp/wifi.list 2>/dev/null || true
-    grep -v '^--$' /tmp/wifi.list | awk -F: '!seen[$1]++' | nl -s ') ' | cut -c1-90
     if [ ! -s /tmp/wifi.list ]; then
-        echo "Nenhuma rede encontrada. Confira se a antena esta habilitada ou aproxime-se do roteador."
+        echo "$(t WIFI_NONE)"
         exit 1
     fi
+    grep -v '^--$' /tmp/wifi.list | awk -F: '!seen[$1]++' | nl -s ') ' | cut -c1-90
     echo ""
-    read -r -p "Digite o numero da rede: " N
+    read -r -p "$(t WIFI_CHOOSE)" N
     case "$N" in
-        *[!0-9]*) echo "Opcao invalida."; exit 1 ;;
+        *[!0-9]*) echo "$(t WIFI_INVALID)"; exit 1 ;;
     esac
     SSID=$(grep -v '^--$' /tmp/wifi.list | awk -F: '!seen[$1]++' | sed -n "${N}p" | cut -d: -f1 | sed 's/\\\\/\\/g')
-    [ -z "$SSID" ] && echo "Opcao invalida." && exit 1
+    [ -z "$SSID" ] && echo "$(t WIFI_INVALID)" && exit 1
 fi
 
 if [ -z "$PW" ]; then
-    read -r -s -p "Senha do WiFi: " PW
+    read -r -s -p "$(t WIFI_PASS)" PW
     echo ""
 fi
 
-echo "Conectando em '$SSID'..."
+tf WIFI_CONNECT "$SSID"
 nmcli dev wifi connect "$SSID" password "$PW" ifname "$DEV"
 
 echo ""
-echo "Conectado a '$SSID'!"
+tf WIFI_OK "$SSID"
 ip -4 addr show "$DEV" | grep inet
