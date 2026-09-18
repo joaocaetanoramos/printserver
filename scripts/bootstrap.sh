@@ -1,43 +1,46 @@
 #!/bin/bash
 # =============================================
-# Bootstrap - Print Server Debian
-# Baixa o repo e roda a instalacao
-# One-liner: wget -qO- <this repo raw URL> | bash
+# Bootstrap - Debian Print Server
+# One-liner: wget -qO- https://raw.githubusercontent.com/joaocaetanoramos/printserver/main/scripts/bootstrap.sh | bash
+# This script runs BEFORE the repo exists, so its messages stay in English.
 # =============================================
 set -e
 
 if [ "$(id -u)" -ne 0 ]; then
-    echo "Rode como root (sudo -i)."
+    echo "Run as root (sudo -i)."
     exit 1
 fi
 
 export DEBIAN_FRONTEND=noninteractive
 
-echo "[0/4] Atualizando lista de pacotes..."
+echo "[0/4] Updating package lists..."
 apt-get update
 
-echo "[1/4] Instalando git..."
+echo "[1/4] Installing git..."
 apt-get install -y git
 
-echo "[2/4] Baixando o repo do printserver..."
+echo "[2/4] Downloading the printserver repo... (may ask for your GitHub credentials)"
 if [ -d /opt/printserver/.git ]; then
     git -C /opt/printserver pull
 else
     git clone https://github.com/joaocaetanoramos/printserver.git /opt/printserver
 fi
 
-echo "[3/4] Rodando instalador..."
+echo "[3/4] Running installer..."
 cd /opt/printserver
 bash scripts/install.sh
 
-echo "[4/4] Configurando firewall..."
+echo "[4/4] Configuring firewall..."
 bash scripts/firewall.sh
 
+# Repo now exists: switch the closing messages to the system language
+[ -f /opt/printserver/lib/i18n.sh ] && . /opt/printserver/lib/i18n.sh
+
 echo ""
-echo "Pronto! Veja o status:"
+echo "$(t BOOT_DONE)"
 bash scripts/status.sh
 echo ""
-echo "O que falta na mao (veja o README):"
-echo "  1. Adicionar as impressoras pela UI do CUPS: http://localhost:631"
-echo "  2. HP: hp-setup -i | Brother: baixar .deb do site | Zebra/genérica: scripts/add-raw-printer.sh"
+echo "$(t BOOT_MANUAL)"
+echo "$(t BOOT_MANUAL_1)"
+echo "$(t BOOT_MANUAL_2)"
 echo ""
