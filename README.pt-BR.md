@@ -65,7 +65,7 @@ wget -qO- https://raw.githubusercontent.com/joaocaetanoramos/printserver/main/sc
 ```
 
 O instalador:
-- instala CUPS + drivers (HP, Epson, Brother laser, térmica, genéricas), Avahi, Samba, UFW;
+- instala CUPS + drivers (HP, Epson, Brother laser, térmica, genéricas), Avahi, Samba, UFW, **NetworkManager (WiFi pronto)**;
 - copia os scripts de operação, adiciona seu usuário ao `lpadmin`;
 - libera as portas certas (631 CUPS, 9100 raw, 5353 Avahi, Samba);
 - habilita e inicia os serviços.
@@ -137,7 +137,7 @@ ps-wifi                # lista as redes, escolhe uma, digita a senha
 ps-wifi MinhaRede MinhaSenha  # ou conecta direto
 ```
 
-O NetworkManager é instalado se preciso e fica só com o WiFi — a configuração
+O NetworkManager é instalado na instalação do servidor e fica só com o WiFi — a configuração
 Ethernet de `/etc/network/interfaces` não é tocada.
 
 Prática recomendada p/ servidor só-WiFi: mantenha DHCP, mas faça uma **reserva
