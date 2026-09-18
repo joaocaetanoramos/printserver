@@ -146,6 +146,7 @@ lpstat -p -d
 | Firewall | `ps-firewall` |
 | Impressora raw (Zebra/genérica) | `ps-add-raw-printer nome ip` |
 | Conectar ao WiFi | `ps-wifi` (menu) ou `ps-wifi SSID SENHA` |
+| IP fixo (Eth ou WiFi) | `ps-ip` |
 | Ferramentas de impressora | `lpinfo -v`, `lpstat -p`, `lpq`, `cancel -a` |
 
 ---
@@ -161,6 +162,25 @@ ps-wifi MinhaRede 12345678
 
 Instala o NetworkManager se preciso. O NetworkManager só gerencia o WiFi — a interface
 Ethernet configurada em `/etc/network/interfaces` continua intacta.
+
+---
+
+## IP fixo (Ethernet ou WiFi)
+
+```bash
+sudo -i
+ps-ip
+```
+
+Detecta a interface ativa e usa os **valores atuais** (IP, gateway, DNS) como sugestão —
+você apenas confirma ou ajusta:
+
+- **Ethernet** → grava `/etc/network/interfaces` (com backup em `/root/net-backup`) e aplica
+  sem derrubar a sessão SSH. Reboot torna definitivo.
+- **WiFi** → aplica via NetworkManager (`nmcli`) e reconecta (a sessão SSH cai por segundos).
+
+> Usando só WiFi? A alternativa mais robusta a IP fixo é a **reserva DHCP no roteador**:
+> o `ps-ip` mostra o MAC do servidor para você registrar na reserva e o IP nunca muda.
 
 ---
 
