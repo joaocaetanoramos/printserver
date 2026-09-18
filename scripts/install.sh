@@ -82,7 +82,7 @@ if ! grep -q '^Listen \*:631' /etc/cups/cupsd.conf 2>/dev/null; then
         echo 'Listen *:631' >> /etc/cups/cupsd.conf
     fi
 fi
-cupsctl --remote-admin --remote-any 2>/dev/null || \
+cupsctl --remote-admin --remote-any --share-printers 2>/dev/null || \
     sed -i 's/Allow localhost$/Allow @LOCAL/' /etc/cups/cupsd.conf
 
 # --- Avahi
