@@ -32,6 +32,7 @@ MSG_INST_ADMIN_MISSING="Usuário 'admin' não encontrado."
 MSG_INST_ADMIN_PROMPT="Usuário para dar admin do CUPS (não use root): "
 MSG_INST_ADMIN_ADDED="Usuário '%s' adicionado ao grupo lpadmin."
 MSG_INST_ADMIN_ERR="! Usuário '%s' não existe. Crie-o ou rode: usermod -aG lpadmin <usuario>"
+MSG_INST_ADMIN_HINT="# digite o nome do usuario que criou no Debian"
 
 # firewall
 MSG_FW_CONFIG="Configurando Firewall..."
